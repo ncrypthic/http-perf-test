@@ -1,0 +1,33 @@
+version: "3.0"
+services:
+  prometheus:
+    image: prom/prometheus:latest
+    volumes:
+      - ./prometheus/prometheus.yml:/etc/prometheus/prometheus.yml
+    ports:
+      - 9090:9090/tcp
+    restart: unless-stopped
+
+  grafana:
+    image: grafana/grafana:latest
+    ports:
+      - 3000:3000/tcp
+    restart: unless-stopped
+
+  node_exporter:
+    image: prom/node-exporter
+    pid: host
+    volumes:
+      - /:/host:ro
+    command:
+      - --path.rootfs=/host
+      - --collector.tcpstat
+    ports:
+      - 9100:9100
+
+  mtls_http_echo:
+    build:
+      dockerfile: ./Dockerfile
+    ports:
+      - 8081:8081
+      - 8080:8080
